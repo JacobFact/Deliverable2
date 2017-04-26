@@ -12,6 +12,10 @@
 #include <arpa/inet.h>
 #include "echo_s_functions.h"
 
+
+//  the child will respond to the TCP connections
+
+
 int main(int argc, char *argv[])
 {
      int *sockfd, *sock,*newsockfd,sockfd_log, portno, length, n, pid, noport, port, maxDescriptor;
