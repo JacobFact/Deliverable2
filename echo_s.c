@@ -80,12 +80,12 @@ int main(int argc, char *argv[])
      // bind the log server socket to port 9999 and output an error if it fails
      bzero(&server,length);
      server.sin_family=AF_INET;
-     //Passes the second argument as the logip
-     //server.sin_addr.s_addr=($2);
+     //Passes the second argument as the logip (Jacob)
+     server.sin_addr.s_addr=($2);
      //server.sin_port=htons(9999);
-	     int portnoU2; // = 8888 // my changes
+	     int portnoU2; // = 8888 // Amine's changes
      portnoU2 = atoi($3);
-     server.sin_port=htons(portnoU2); // my changes
+     server.sin_port=htons(portnoU2); // Amine's changes
      if (bind(sockfd_log,(struct sockaddr *)&server,length)<0) 
               error("ERROR on binding line 73");
      fromlen = sizeof(struct sockaddr_in);
