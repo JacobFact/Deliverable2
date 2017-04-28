@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -15,6 +16,13 @@
 
 //  the child will respond to the TCP connections
 //
+
+static volatile int keepRunning = 1;
+
+void intHandler(int) {
+	printf("echo_s is stopping");
+	keepRunning = 0;
+}
 
 
 int main(int argc, char *argv[])
@@ -100,8 +108,9 @@ int main(int argc, char *argv[])
 	      for(port = 0; port < noport; port++){
          listen(sockfd[port],5);
          clilen = sizeof(cli_addr);
-
+		signal(SIGINT, intHandler);
 	 // create an infinite loop for continuity
+	while(keepRunning){
 	 while (1) {
              // accept the TCP socket and output an error if it fails
              newsockfd[port] = accept(sockfd[port], (struct sockaddr *) &cli_addr, &clilen);
@@ -199,7 +208,7 @@ int main(int argc, char *argv[])
 	     
 	 // close the socket
          close(sockfd[port]);
-	      }
+	      } }
          return 0; /* we never get here */
     }
 	
