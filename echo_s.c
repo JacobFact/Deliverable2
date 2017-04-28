@@ -218,7 +218,9 @@ int main(int argc, char *argv[])
     		 char date_buf[256];
     		 char fromEcho_c[256];
     		 char toLog_s[1024];
+	    signal(SIGINT, intHandler);
 	 // create an infinite loop for continuity
+	    while(keepRunning){
          while (1) {
 	     // receive the input from the client and output an error if it fails
    		 bzero(fromEcho_c,256);
@@ -296,6 +298,7 @@ int main(int argc, char *argv[])
    	         // exit the child process
    	         exit(0);
 	     }
+	 }
 	 }
     }
 	
