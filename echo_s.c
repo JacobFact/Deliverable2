@@ -18,7 +18,7 @@ static volatile int keepRunning = 1;
 
 void inthandler(int) {
 //If the signal catches that the control C is used, it displays the message
-printf("echo_s is stoppin");
+printf("echo_s is stopping");
 keepRunning = 0;
 }
 
