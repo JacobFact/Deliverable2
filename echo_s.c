@@ -5,15 +5,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 #include "echo_s_functions.h"
-#include <signal.h>
 
-static bolatile int keepRunning = 1;
+
+static volatile int keepRunning = 1;
 
 void inthandler(int) {
 //If the signal catches that the control C is used, it displays the message
@@ -23,6 +24,7 @@ keepRunning = 0;
 
 //  the child will respond to the TCP connections
 //
+
 
 
 int main(int argc, char *argv[])
@@ -108,12 +110,9 @@ int main(int argc, char *argv[])
 	      for(port = 0; port < noport; port++){
          listen(sockfd[port],5);
          clilen = sizeof(cli_addr);
-
-	 signal(SIGINT,intHandler);
-
-	 while(keepRunning){
-
+		signal(SIGINT, inthandler);
 	 // create an infinite loop for continuity
+	while(keepRunning){
 	 while (1) {
              // accept the TCP socket and output an error if it fails
              newsockfd[port] = accept(sockfd[port], (struct sockaddr *) &cli_addr, &clilen);
@@ -207,12 +206,12 @@ int main(int argc, char *argv[])
 		 
              // the parent closes the socket; to continue the server
              else close(newsockfd[port]);
-	     }
+	     
 	 } /* end of while */
 	     
 	 // close the socket
          close(sockfd[port]);
-	      }
+	      } }
          return 0; /* we never get here */
     }
 	
@@ -222,10 +221,10 @@ int main(int argc, char *argv[])
     		 char date_buf[256];
     		 char fromEcho_c[256];
     		 char toLog_s[1024];
-
-		 signal(SIGINT, intHandler);
+		 signal(SIGINT, inthandler);
 	 // create an infinite loop for continuity
 	 while(keepRunning){
+	 // create an infinite loop for continuity
          while (1) {
 	     // receive the input from the client and output an error if it fails
    		 bzero(fromEcho_c,256);
@@ -302,8 +301,10 @@ int main(int argc, char *argv[])
 	     }
    	         // exit the child process
    	         exit(0);
-	     }
-	 }}
+	  
+	 
+	 }
+	 }
     }
 	
     // close all sockets
