@@ -11,7 +11,15 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include "echo_s_functions.h"
+#include <signal.h>
 
+static bolatile int keepRunning = 1;
+
+void inthandler(int) {
+//If the signal catches that the control C is used, it displays the message
+printf("echo_s is stoppin");
+keepRunning = 0;
+}
 
 //  the child will respond to the TCP connections
 //
@@ -100,6 +108,10 @@ int main(int argc, char *argv[])
 	      for(port = 0; port < noport; port++){
          listen(sockfd[port],5);
          clilen = sizeof(cli_addr);
+
+	 signal(SIGINT,intHandler);
+
+	 while(keepRunning){
 
 	 // create an infinite loop for continuity
 	 while (1) {
@@ -195,6 +207,7 @@ int main(int argc, char *argv[])
 		 
              // the parent closes the socket; to continue the server
              else close(newsockfd[port]);
+	     }
 	 } /* end of while */
 	     
 	 // close the socket
@@ -209,7 +222,10 @@ int main(int argc, char *argv[])
     		 char date_buf[256];
     		 char fromEcho_c[256];
     		 char toLog_s[1024];
+
+		 signal(SIGINT, intHandler);
 	 // create an infinite loop for continuity
+	 while(keepRunning){
          while (1) {
 	     // receive the input from the client and output an error if it fails
    		 bzero(fromEcho_c,256);
@@ -287,7 +303,7 @@ int main(int argc, char *argv[])
    	         // exit the child process
    	         exit(0);
 	     }
-	 }
+	 }}
     }
 	
     // close all sockets
