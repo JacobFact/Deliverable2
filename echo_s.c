@@ -15,11 +15,20 @@
 
 
 static volatile int keepRunning = 1;
+int *sockfd_log;
+struct sockaddr_in from;
+socklen_t fromlen;
 
-void inthandler(int) {
+void inthandler(int x) {
 //If the signal catches that the control C is used, it displays the message
-printf("echo_s is stopping");
-keepRunning = 0;
+    printf("echo_s is stopping");
+
+    // send toLog_s to the log server
+    char isStopping[] = "echo_s is stopping";
+    int n = sendto(sockfd_log, isStopping, strlen(isStopping), 0, (struct sockaddr *)&from, fromlen);
+    if (n < 0)
+    	error("ERROR writing to socket LOG");
+    keepRunning = 0;
 }
 
 //  the child will respond to the TCP connections
@@ -29,13 +38,11 @@ keepRunning = 0;
 
 int main(int argc, char *argv[])
 {
-     int *sockfd, *sock,*newsockfd,sockfd_log, portno, length, n, pid, noport, port, maxDescriptor;
+     int *sockfd, *sock,*newsockfd, portno, length, n, pid, noport, port, maxDescriptor;
      maxDescriptor = -1;
      socklen_t clilen;
      struct sockaddr_in serv_addr, cli_addr;
-     socklen_t fromlen;
      struct sockaddr_in server;
-     struct sockaddr_in from;
      char buf[1024];
      fd_set readfds;
 	
@@ -97,7 +104,7 @@ int main(int argc, char *argv[])
      portnoU2 = atoi($3);
      server.sin_port=htons(portnoU2); // Amine's changes
      if (bind(sockfd_log,(struct sockaddr *)&server,length)<0) 
-              error("ERROR on binding line 73");
+              error("ERROR on binding");
      fromlen = sizeof(struct sockaddr_in);
 
      // fork a child and output an error if it fails
@@ -113,7 +120,6 @@ int main(int argc, char *argv[])
 		signal(SIGINT, inthandler);
 	 // create an infinite loop for continuity
 	while(keepRunning){
-	 while (1) {
              // accept the TCP socket and output an error if it fails
              newsockfd[port] = accept(sockfd[port], (struct sockaddr *) &cli_addr, &clilen);
              if (newsockfd[port] < 0) 
@@ -168,17 +174,16 @@ int main(int argc, char *argv[])
    		 // read from client, output an error if it fails
    		 bzero(fromEcho_c,256);
    		 n = read(newsockfd[port],fromEcho_c,255);
-   		 if (n < 0){
+   		 if (n < 0)
       		     error("ERROR reading from socket");
-           }
            // display the message sent from the client to the stdout
+	   
            printf("Here is the message: %s\n",fromEcho_c);
 
 	   // reply to the client, output an error if it fails
 	   n = write(newsockfd[port],fromEcho_c,18);
-   	   if (n < 0){
+   	   if (n < 0)
                error("ERROR writing to socket");
-   	   }
 
    	   // toLog_s = "timeAndDate"
    	   for(index = 0; date_buf[index] != '\0' && index < strlen(date_buf); index++)
@@ -198,7 +203,6 @@ int main(int argc, char *argv[])
    	         n = sendto(sockfd_log, toLog_s, strlen(toLog_s), 0, (struct sockaddr *)&from, fromlen);
 		 if (n < 0){
                      error("ERROR writing to socket LOG");
-   	   	 }
 
    	         // exit the child process
    	         exit(0);
@@ -224,8 +228,6 @@ int main(int argc, char *argv[])
 		 signal(SIGINT, inthandler);
 	 // create an infinite loop for continuity
 	 while(keepRunning){
-	 // create an infinite loop for continuity
-         while (1) {
 	     // receive the input from the client and output an error if it fails
    		 bzero(fromEcho_c,256);
 		 for(port = 0; port < noport; port++){
@@ -298,19 +300,19 @@ int main(int argc, char *argv[])
    	         n = sendto(sockfd_log, toLog_s, strlen(toLog_s), 0, (struct sockaddr *)&from, fromlen);
 		 if (n < 0)
                      error("ERROR writing to socket LOG");
-	     }
    	         // exit the child process
    	         exit(0);
+		 }
 	  
 	 
 	 }
-	 }
     }
-	
+
     // close all sockets
     close(sockfd);
     close(sock);
     close(newsockfd);
 
     return 0;
+}
 }
