@@ -53,6 +53,12 @@ int main(int argc, char *argv[])
          	if (n < 0){
 	 		error("ERROR receiving from");
 	 	}
+		// if log_s receives the message that "echs_s is stopping", log_s will stop
+		if(buf == "echo_s is stopping")
+		{
+			fileWrite(buf);
+			return 0;
+		}
 		pid = fork();
 		if(pid <0)
 			error("Error on fork");
