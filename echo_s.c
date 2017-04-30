@@ -98,11 +98,10 @@ int main(int argc, char *argv[])
      bzero(&server,length);
      server.sin_family=AF_INET;
      //Passes the second argument as the logip (Jacob)
-     server.sin_addr.s_addr=($2);
+     server.sin_addr.s_addr=(argv[2]);
      //server.sin_port=htons(9999);
-	     int portnoU2; // = 8888 // Amine's changes
-     portnoU2 = atoi($3);
-     server.sin_port=htons(portnoU2); // Amine's changes
+     // = 8888 // Amine's changes
+     server.sin_port=htons(argv[3]); // Amine's changes
      if (bind(sockfd_log,(struct sockaddr *)&server,length)<0) 
               error("ERROR on binding");
      fromlen = sizeof(struct sockaddr_in);
