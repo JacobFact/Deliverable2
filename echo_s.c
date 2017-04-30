@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
      server.sin_addr.s_addr=(argv[2]);
      //server.sin_port=htons(9999);
      // = 8888 // Amine's changes
-     server.sin_port=htons(argv[3]); // Amine's changes
+     server.sin_port=(argv[3]); // Amine's changes
      if (bind(sockfd_log,(struct sockaddr *)&server,length)<0) 
               error("ERROR on binding");
      fromlen = sizeof(struct sockaddr_in);
